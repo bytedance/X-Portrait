@@ -51,7 +51,7 @@ num_drivings: frame length for temporal attention in motion module, fixed as 16
 wonoise: using reference image without adding noise  
 source_image: path of source image  
 driving_video: path of driving video  
-best_frame: specify the frame index in the driving video where the head pose best matches the source image (precision of best_frame index might affect the final quality) 
+best_frame: specify the frame index in the driving video where the head pose best matches the source image (precision of best_frame index might affect the final quality)  
 out_frames: number of generation frames  
 skip: selecting one frame while skipping a number of frames in the driving video during inference  
 num_mix: number of overlapping frames when applying prompt travelling during inference  
