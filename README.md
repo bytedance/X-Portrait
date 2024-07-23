@@ -57,7 +57,7 @@ parameters:
 
 ## Performance Boost
 **efficiency**: Our model is compatible with LCM LoRA (https://huggingface.co/latent-consistency/lcm-lora-sdv1-5), which helps reduce the number of inference steps.  
-**quality**: 
+**expressiveness**: Expressiveness of the results could be boosted if results of other face reenactment approaches, e.g., face vid2vid, could be provided to generate inital noise via parameter "--initial_facevid2vid_results".  
 
 ## 🎓 Citation
 If you find this codebase useful for your research, please use the following entry.

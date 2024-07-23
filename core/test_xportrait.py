@@ -23,6 +23,8 @@ from skimage.transform import resize
 from skimage import img_as_ubyte
 import face_alignment
 import sys
+from decord import VideoReader
+from decord import cpu, gpu
 
 TORCH_VERSION = torch.__version__.split(".")[0]
 FP16_DTYPE = torch.float16
@@ -278,12 +280,25 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
 
     vae_bs = 8 
 
-    cond = batch_data['sources'][:nSample].reshape([-1, ch, h, w])
-    pre_noise=[]
-    for i in range(0, nSample, vae_bs):
-        pre_noise.append(infer_model.get_first_stage_encoding(infer_model.encode_first_stage(cond[i:i+vae_bs])))
-    pre_noise = torch.cat(pre_noise, dim=0)
-    pre_noise = infer_model.q_sample(x_start = pre_noise, t = torch.tensor([999]).to(pre_noise.device))
+    if args.initial_facevid2vid_results:
+        facevid2vid = []
+        facevid2vid_results = VideoReader(args.initial_facevid2vid_results, ctx=cpu(0))
+        for frame_id in range(len(facevid2vid_results)):
+            frame = cv2.resize(facevid2vid_results[frame_id].asnumpy(),(512,512)) / 255
+            facevid2vid.append(torch.from_numpy(frame * 2 - 1).permute(2,0,1))
+        cond = torch.stack(facevid2vid)[:nSample].float().to(args.device)
+        pre_noise=[]
+        for i in range(0, nSample, vae_bs):
+            pre_noise.append(infer_model.get_first_stage_encoding(infer_model.encode_first_stage(cond[i:i+vae_bs])))
+        pre_noise = torch.cat(pre_noise, dim=0)
+        pre_noise = infer_model.q_sample(x_start = pre_noise, t = torch.tensor([999]).to(pre_noise.device))
+    else:
+        cond = batch_data['sources'][:nSample].reshape([-1, ch, h, w])
+        pre_noise=[]
+        for i in range(0, nSample, vae_bs):
+            pre_noise.append(infer_model.get_first_stage_encoding(infer_model.encode_first_stage(cond[i:i+vae_bs])))
+        pre_noise = torch.cat(pre_noise, dim=0)
+        pre_noise = infer_model.q_sample(x_start = pre_noise, t = torch.tensor([999]).to(pre_noise.device))
 
     text = ["" for _ in range(nSample)]
     
@@ -466,6 +481,8 @@ if __name__ == "__main__":
     parser.add_argument('--ema_rate', type = float, default = 0,
                         help='rate for ema')
     ## inference
+    parser.add_argument("--initial_facevid2vid_results", type=str, default=None,
+                    help="facevid2vid results for noise initialization")
     parser.add_argument('--ddim_steps', type = int, default = 1,
                         help='denoising steps')
     parser.add_argument('--uc_scale', type = int, default = 5,

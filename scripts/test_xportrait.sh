@@ -1,7 +1,7 @@
 python3 core/test_xportrait.py \
 --model_config config/cldm_v15_appearance_pose_local_mm.yaml \
 --output_dir outputs \
---resume_dir /mnt/bn/neural-motion-data4k/yx/Xportrait/morphable_nerf/motion_transfer/motion_diffusion_0228/checkpoint \
+--resume_dir checkpoint \
 --seed 999 \
 --global_step 415001 \
 --uc_scale 5 \
