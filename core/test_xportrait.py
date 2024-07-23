@@ -260,6 +260,9 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
     driving_video_name = os.path.basename(batch_data['video_name']).split('.')[0]
     source_name = os.path.basename(batch_data['source_name']).split('.')[0]
 
+    if not os.path.exists(local_image_dir):
+        os.mkdir(local_image_dir)
+
     uc_scale = 5
     if preset_output_name:
         preset_output_name = preset_output_name.split('.')[0]+'.mp4'
@@ -273,17 +276,14 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
     
     _, _, ch, h, w = batch_data['sources'].shape
 
-    vae_bs = 8 
-    if args.inference_from_noisy_img:
-        cond = batch_data['sources'][:nSample].reshape([-1, ch, h, w])
-        pre_noise=[]
-        for i in range(0, nSample, vae_bs):
-            pre_noise.append(infer_model.get_first_stage_encoding(infer_model.encode_first_stage(cond[i:i+vae_bs])))
-        pre_noise = torch.cat(pre_noise, dim=0)
-        pre_noise = infer_model.q_sample(x_start = pre_noise, t = torch.tensor([999]).to(pre_noise.device))
-    else:
-        noise_shape = (nSample, infer_model.channels, infer_model.image_size, infer_model.image_size)
-        pre_noise = torch.randn(noise_shape)
+    vae_bs = 5 
+
+    cond = batch_data['sources'][:nSample].reshape([-1, ch, h, w])
+    pre_noise=[]
+    for i in range(0, nSample, vae_bs):
+        pre_noise.append(infer_model.get_first_stage_encoding(infer_model.encode_first_stage(cond[i:i+vae_bs])))
+    pre_noise = torch.cat(pre_noise, dim=0)
+    pre_noise = infer_model.q_sample(x_start = pre_noise, t = torch.tensor([999]).to(pre_noise.device))
 
     text = ["" for _ in range(nSample)]
     
@@ -361,7 +361,7 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
     
     output_img = output_img.data.cpu().numpy()
     output_img = img_as_ubyte(output_img)
-    imageio.mimsave(output_path, output_img, fps=batch_data['fps'], quality=10, pixelformat='yuv420p', codec='libx264')
+    imageio.mimsave(output_path, output_img[:,:,:512], fps=batch_data['fps'], quality=10, pixelformat='yuv420p', codec='libx264')
 
 def main(args):
     
@@ -469,8 +469,6 @@ if __name__ == "__main__":
     ## inference
     parser.add_argument('--ddim_steps', type = int, default = 1,
                         help='denoising steps')
-    parser.add_argument('--inference_from_noisy_img', action='store_true', default=False,
-                        help='use noisy reference img')
     parser.add_argument("--num_drivings", type = int, default = 1,
                         help="Number of driving images in a single sequence of video.")
     parser.add_argument("--output_dir", type=str, default=None, required=True,

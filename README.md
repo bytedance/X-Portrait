@@ -56,7 +56,6 @@ out_frames: number of generation frames
 skip: selecting one frame while skipping a number of frames in the driving video during inference  
 num_mix: number of overlapping frames when applying prompt travelling during inference  
 ddim_steps: number of inference steps (30 steps for ddim)     
-inference_from_noisy_img: whether using source image to initialize noise for inference  
 
 ## Acceleration
 Our model is compatible with LCM LoRA (https://huggingface.co/latent-consistency/lcm-lora-sdv1-5), which helps reduce the number of inference steps.
