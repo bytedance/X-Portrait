@@ -45,20 +45,19 @@ Please download pre-trained model from [here](https://drive.google.com/drive/fol
 bash scripts/test_xportrait.sh
 ```
 parameters:  
-model_config: config file of the corresponding model  
-output_dir: output path for generated video  
-num_drivings: frame length for temporal attention in motion module, fixed as 16  
-wonoise: using reference image without adding noise  
-source_image: path of source image  
-driving_video: path of driving video  
-best_frame: specify the frame index in the driving video where the head pose best matches the source image (precision of best_frame index might affect the final quality)  
-out_frames: number of generation frames  
-skip: selecting one frame while skipping a number of frames in the driving video during inference  
-num_mix: number of overlapping frames when applying prompt travelling during inference  
-ddim_steps: number of inference steps (30 steps for ddim)     
+**model_config**: config file of the corresponding model  
+**output_dir**: output path for generated video  
+**source_image**: path of source image  
+**driving_video**: path of driving video  
+**best_frame**: specify the frame index in the driving video where the head pose best matches the source image (precision of best_frame index might affect the final quality)  
+**out_frames**: number of generation frames  
+**skip**: selecting one frame while skipping a number of frames in the driving video during inference  
+**num_mix**: number of overlapping frames when applying prompt travelling during inference  
+**ddim_steps**: number of inference steps (e.g., 30 steps for ddim)     
 
-## Acceleration
-Our model is compatible with LCM LoRA (https://huggingface.co/latent-consistency/lcm-lora-sdv1-5), which helps reduce the number of inference steps.
+## Performance Boost
+**efficiency**: Our model is compatible with LCM LoRA (https://huggingface.co/latent-consistency/lcm-lora-sdv1-5), which helps reduce the number of inference steps.  
+**quality**: 
 
 ## 🎓 Citation
 If you find this codebase useful for your research, please use the following entry.

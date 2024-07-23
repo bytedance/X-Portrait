@@ -263,7 +263,7 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
     if not os.path.exists(local_image_dir):
         os.mkdir(local_image_dir)
 
-    uc_scale = 5
+    uc_scale = args.uc_scale
     if preset_output_name:
         preset_output_name = preset_output_name.split('.')[0]+'.mp4'
         output_path = f"{local_image_dir}/{preset_output_name}"
@@ -276,7 +276,7 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
     
     _, _, ch, h, w = batch_data['sources'].shape
 
-    vae_bs = 5 
+    vae_bs = 8 
 
     cond = batch_data['sources'][:nSample].reshape([-1, ch, h, w])
     pre_noise=[]
@@ -439,16 +439,15 @@ if __name__ == "__main__":
                         help="The path of model config file")
     parser.add_argument('--reinit_hint_block', action='store_true', default=False,
                         help="Re-initialize hint blocks for channel mis-match")
-    parser.add_argument('--image_size',  type =int, default=64)
     parser.add_argument('--sd_locked', type =str2bool, default=True,
                         help='Freeze parameters in original stable-diffusion decoder')
     parser.add_argument('--only_mid_control', type =str2bool, default=False,
                         help='Only control middle blocks')
-    parser.add_argument('--control_type', type=str, default="pose",
+    parser.add_argument('--control_type', type=str, default="appearance_pose_local_mm",
                         help='The type of conditioning')
-    parser.add_argument("--control_mode", type=str, default="balance",
+    parser.add_argument("--control_mode", type=str, default="controlnet_important",
                         help="Set controlnet is more important or balance.")
-    parser.add_argument('--wonoise', action='store_true', default=False,
+    parser.add_argument('--wonoise', action='store_false', default=True,
                         help='Use with referenceonly, remove adding noise on reference image')
  
     ## Training
@@ -456,7 +455,7 @@ if __name__ == "__main__":
     parser.add_argument("--world_size", type=int, default=1)
     parser.add_argument('--seed', type=int, default=42, 
                         help='random seed for initialization')
-    parser.add_argument('--use_fp16', action='store_true', default=False,
+    parser.add_argument('--use_fp16', action='store_false', default=True,
                         help='Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit')
     parser.add_argument('--global_step', type=int, default=0,
                         help='initial global step to start with')
@@ -469,7 +468,9 @@ if __name__ == "__main__":
     ## inference
     parser.add_argument('--ddim_steps', type = int, default = 1,
                         help='denoising steps')
-    parser.add_argument("--num_drivings", type = int, default = 1,
+    parser.add_argument('--uc_scale', type = int, default = 5,
+                        help='cfg')
+    parser.add_argument("--num_drivings", type = int, default = 16,
                         help="Number of driving images in a single sequence of video.")
     parser.add_argument("--output_dir", type=str, default=None, required=True,
                         help="The output directory where the model predictions and checkpoints will be written.")
