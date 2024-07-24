@@ -228,7 +228,6 @@ def load_state_dict(model, ckpt_path, reinit_hint_block=False, strict=True, map_
         for k in list(state_dict.keys()):
             if k.startswith("control_model.input_hint_block"):
                 state_dict.pop(k)
-   
     model.load_state_dict(state_dict, strict=strict)
     del state_dict   
 
@@ -258,7 +257,7 @@ def get_cond_control(args, batch_data, control_type, device, start, end, model=N
     else:
         raise NotImplementedError(f"cond_type={control_type} not supported!")
 
-def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, local_image_dir, num_mix=4, preset_output_name=''):
+def visualize_mm(args, name, batch_data, infer_model, nSample, local_image_dir, num_mix=4, preset_output_name=''):
     driving_video_name = os.path.basename(batch_data['video_name']).split('.')[0]
     source_name = os.path.basename(batch_data['source_name']).split('.')[0]
 
@@ -270,7 +269,7 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
         preset_output_name = preset_output_name.split('.')[0]+'.mp4'
         output_path = f"{local_image_dir}/{preset_output_name}"
     else:
-        output_path = f"{local_image_dir}/{name}_{args.control_type}_{global_step}_uc{uc_scale}_{source_name}_by_{driving_video_name}_mix{num_mix}.mp4"
+        output_path = f"{local_image_dir}/{name}_{args.control_type}_uc{uc_scale}_{source_name}_by_{driving_video_name}_mix{num_mix}.mp4"
 
     infer_model.eval()
 
@@ -278,7 +277,7 @@ def visualize_mm(args, name, batch_data, infer_model, global_step, nSample, loca
     
     _, _, ch, h, w = batch_data['sources'].shape
 
-    vae_bs = 8 
+    vae_bs = 16
 
     if args.initial_facevid2vid_results:
         facevid2vid = []
@@ -411,15 +410,9 @@ def main(args):
     # ******************************
     # load pre-trained models
     # ******************************
-    global_step = args.global_step
     if args.resume_dir is not None:
         if args.local_rank == 0:
-            load_state_dict(model, os.path.join(args.resume_dir, f"model_state-{global_step}.th"), strict=False)
-        if args.rank == 0 and model_ema is not None:
-            if os.path.exists(os.path.join(args.resume_dir, f"model_state-{global_step}_ema_{args.ema_rate}.th")):
-                load_state_dict(model_ema.ema_model, os.path.join(args.resume_dir, f"model_state-{global_step}_ema_{args.ema_rate}.th"))
-            else:
-                model_ema.copy_params_from_model_to_ema()
+            load_state_dict(model, args.resume_dir, strict=False)
     else:
         print('please privide the correct resume_dir!')
         exit()
@@ -442,7 +435,7 @@ def main(args):
             infer_batch_data['video_name'] = os.path.basename(driving_video)
             infer_batch_data['source_name'] = args.source_image
             nSample = infer_batch_data['sources'].shape[0]
-            visualize_mm(args, "inference", infer_batch_data, infer_model, global_step, nSample=nSample, local_image_dir=args.output_dir, num_mix=args.num_mix)
+            visualize_mm(args, "inference", infer_batch_data, infer_model, nSample=nSample, local_image_dir=args.output_dir, num_mix=args.num_mix)
 
 
 if __name__ == "__main__":
@@ -472,8 +465,6 @@ if __name__ == "__main__":
                         help='random seed for initialization')
     parser.add_argument('--use_fp16', action='store_false', default=True,
                         help='Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit')
-    parser.add_argument('--global_step', type=int, default=0,
-                        help='initial global step to start with')
     parser.add_argument('--compile', type=str2bool, default=False,
                         help='compile model (for torch 2)')
     parser.add_argument('--eta', type = float, default = 0.0,

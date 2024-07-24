@@ -1,9 +1,8 @@
 python3 core/test_xportrait.py \
 --model_config config/cldm_v15_appearance_pose_local_mm.yaml \
 --output_dir outputs \
---resume_dir checkpoint \
+--resume_dir checkpoint/xportrait-release.ckpt \
 --seed 999 \
---global_step 415001 \
 --uc_scale 5 \
 --source_image assets/source_image.png \
 --driving_video assets/driving_video.mp4 \
