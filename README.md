@@ -49,15 +49,14 @@ parameters:
 **output_dir**: output path for generated video  
 **source_image**: path of source image  
 **driving_video**: path of driving video  
-**best_frame**: specify the frame index in the driving video where the head pose best matches the source image (precision of best_frame index might affect the final quality)  
+**best_frame**: specify the frame index in the driving video where the head pose best matches the source image (note: precision of best_frame index might affect the final quality)  
 **out_frames**: number of generation frames  
-**skip**: selecting one frame while skipping a number of frames in the driving video during inference  
 **num_mix**: number of overlapping frames when applying prompt travelling during inference  
 **ddim_steps**: number of inference steps (e.g., 30 steps for ddim)     
 
 ## Performance Boost
 **efficiency**: Our model is compatible with LCM LoRA (https://huggingface.co/latent-consistency/lcm-lora-sdv1-5), which helps reduce the number of inference steps.  
-**expressiveness**: Expressiveness of the results could be boosted if results of other face reenactment approaches, e.g., face vid2vid, could be provided to generate inital noise via parameter "--initial_facevid2vid_results".  
+**expressiveness**: Expressiveness of the results could be boosted if results of other face reenactment approaches, e.g., face vid2vid, could be provided via parameter "--initial_facevid2vid_results".  
 
 ## 🎓 Citation
 If you find this codebase useful for your research, please use the following entry.

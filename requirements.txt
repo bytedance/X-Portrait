@@ -66,3 +66,5 @@ diffusers==0.26.0
 
 # Face Keypoint
 thriftpy2
+
+decord
