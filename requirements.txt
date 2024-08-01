@@ -68,3 +68,4 @@ diffusers==0.26.0
 thriftpy2
 
 decord
+face-alignment
