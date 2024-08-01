@@ -9,7 +9,7 @@ invisible-watermark>=0.2.0
 matplotlib>=3.7.2
 natsort>=8.4.0
 ninja>=1.11.1
-numpy>=1.24.4
+numpy==1.23.0
 omegaconf>=2.3.0
 open-clip-torch>=2.20.0
 pandas>=2.0.3
@@ -45,8 +45,8 @@ imageio==2.9.0
 kornia==0.6.11
 
 # Training
-byted-dataloader==0.3.7
-byted-mloops==0.2.21
+# byted-dataloader==0.3.7
+# byted-mloops==0.2.21
 accelerate==0.17.0
 ema-pytorch==0.2.1
 tensorboard==2.11.2
